@@ -54,7 +54,7 @@
     "status": "backlog",
     "assignee": "Yuri Barbosa",
     "description": "Criar versão simples do procedimento para consulta rápida pela equipe durante indisponibilidade de sistema.",
-    "tags": ["pcn", "documentacao"],
+    "tags": ["pcn", "documentação"],
     "createdAt": "2026-05-23T13:00:00.000Z",
     "updatedAt": "2026-05-23T13:00:00.000Z",
     "dueAt": "2026-05-29T13:00:00.000Z"

@@ -6,14 +6,14 @@
 - Filtros por busca, status, prioridade e categoria
 - Criacao de chamados
 - Atualizacao de status
-- API REST com validacao
+- API REST com validação
 - Testes de dominio, API e formulario
 - CI com GitHub Actions
 
 ## Versao 0.2
 
-- Historico de eventos por chamado
-- Comentarios internos
+- Histórico de eventos por chamado
+- Comentários internos
 - Responsaveis cadastrados
 - Exportacao CSV
 - Screenshots no README

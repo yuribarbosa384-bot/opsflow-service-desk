@@ -1,33 +1,33 @@
 # OpsFlow Service Desk
 
-Sistema full-stack de service desk operacional para controlar chamados, prioridade, SLA e status de atendimento.
+Sistema full stack de service desk operacional para controlar chamados, prioridade, SLA e status de atendimento.
 
-O projeto foi desenhado para portfolio: ele mostra produto funcionando, regras de negocio, API, validacao, testes automatizados, CI e documentacao de decisao tecnica.
+O projeto apresenta um fluxo completo de produto: interface, API, validação, regras de negócio, testes automatizados, CI e documentação técnica.
 
-Repositorio: https://github.com/yuribarbosa384-bot/opsflow-service-desk
+Repositório: https://github.com/yuribarbosa384-bot/opsflow-service-desk
 
-![Visao geral do OpsFlow](docs/screenshots/overview.png)
+![Visão geral do OpsFlow](docs/screenshots/overview.png)
 
 ## Problema
 
-Equipes administrativas e operacionais costumam acompanhar demandas em planilhas, mensagens soltas e controles paralelos. O OpsFlow centraliza a fila de chamados e ajuda a priorizar o que esta urgente, vencido ou em risco.
+Equipes administrativas e operacionais costumam acompanhar demandas em planilhas, mensagens soltas e controles paralelos. O OpsFlow centraliza a fila de chamados e ajuda a priorizar o que está urgente, vencido ou em risco.
 
 ## Stack
 
 - React 19, TypeScript, Vite e Tailwind CSS
 - Express 5 com API REST
-- Zod para contratos e validacao
+- Zod para contratos e validação
 - Vitest, Testing Library e Supertest
 - GitHub Actions para CI
-- Persistencia local em JSON para evitar dependencia de Docker no primeiro ciclo
+- Persistência local em JSON para facilitar execução e avaliação
 
 ## O que este projeto demonstra
 
-- Modelagem de dominio com tipos e validacao compartilhados
-- API com rotas, filtros, criacao e atualizacao de status
+- Modelagem de domínio com tipos e validação compartilhados
+- API com rotas, filtros, criação e atualização de status
 - Interface responsiva com dashboard, filtros, tabela e painel de detalhe
-- Testes de regra de negocio, API e formulario
-- Documentacao de produto, decisoes tecnicas e roadmap
+- Testes de regra de negócio, API e formulário
+- Documentação de produto, decisões técnicas e roadmap
 - Estrutura de monorepo com apps e pacote compartilhado
 
 ## Como rodar
@@ -62,7 +62,7 @@ POST   /api/tickets
 PATCH  /api/tickets/:id/status
 ```
 
-Filtros disponiveis em `GET /api/tickets`:
+Filtros disponíveis em `GET /api/tickets`:
 
 ```text
 q
@@ -71,31 +71,23 @@ priority
 category
 ```
 
-## Case study
+## Estudo de caso
 
 ### Contexto
 
 O projeto parte de uma dor comum em rotinas administrativas: acompanhar documentos, contratos, acessos e tarefas internas sem perder prazo.
 
-### Decisoes principais
+### Decisões principais
 
-- O dominio fica em `packages/domain` para que API e web usem as mesmas regras.
+- O domínio fica em `packages/domain` para que API e web usem as mesmas regras.
 - A API valida entrada com Zod antes de persistir dados.
-- A interface prioriza leitura rapida, status e SLA, porque o usuario operacional precisa decidir rapido.
-- A persistencia local em JSON foi escolhida para manter o projeto simples de executar por recrutadores.
+- A interface prioriza leitura rápida, status e SLA, porque o usuário operacional precisa decidir rápido.
+- A persistência local em JSON mantém o projeto simples de executar em uma avaliação técnica.
 
-### Evolucoes planejadas
+### Evoluções planejadas
 
-- Autenticacao por usuario e perfis de acesso
+- Autenticação por usuário e perfis de acesso
 - Banco SQLite ou Postgres
-- Historico de eventos por chamado
+- Histórico de eventos por chamado
 - Deploy da web e API
 - Screenshots do produto no README
-
-## Referencias usadas como criterio de qualidade
-
-- GitHub Docs: READMEs ajudam visitantes a entenderem rapidamente o que o projeto faz e como usar.
-- GitHub Docs: GitHub Actions executa automacoes de build e teste em eventos do repositorio.
-- React Docs: componentes devem representar estados de UI claros e previsiveis.
-- Testing Library: testes devem se aproximar da forma como usuarios interagem com a interface.
-- MDN: formularios e HTML semantico melhoram acessibilidade e manutencao.

@@ -8,3 +8,4 @@ apps/api/data/runtime-tickets.json
 *.tsbuildinfo
 apps/**/src/**/*.js
 apps/**/vite.config.js
+dev-server*.log

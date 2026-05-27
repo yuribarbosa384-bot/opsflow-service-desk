@@ -140,7 +140,7 @@ export function TicketForm({ onSubmit, onCancel }: TicketFormProps) {
           <span className="mb-1 block text-sm font-medium text-slate-700">Tags</span>
           <input
             className="h-10 w-full rounded-md border border-slate-200 px-3 text-sm"
-            placeholder="excel, automacao, documentos"
+            placeholder="excel, automação, documentos"
             value={form.tags}
             onChange={(event) => setForm({ ...form, tags: event.target.value })}
           />
