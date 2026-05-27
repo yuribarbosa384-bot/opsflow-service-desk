@@ -4,6 +4,8 @@ Sistema full-stack de service desk operacional para controlar chamados, priorida
 
 O projeto foi desenhado para portfolio: ele mostra produto funcionando, regras de negocio, API, validacao, testes automatizados, CI e documentacao de decisao tecnica.
 
+Repositorio: https://github.com/yuribarbosa384-bot/opsflow-service-desk
+
 ![Visao geral do OpsFlow](docs/screenshots/overview.png)
 
 ## Problema
