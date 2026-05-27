@@ -1,0 +1,25 @@
+{
+  "name": "opsflow-service-desk",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Full-stack service desk para demonstrar React, TypeScript, API, validação, testes e documentação de produto.",
+  "type": "module",
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ],
+  "scripts": {
+    "dev": "concurrently -k -n API,WEB -c cyan,magenta \"npm run dev -w @opsflow/api\" \"npm run dev -w @opsflow/web\"",
+    "build": "npm run build -w @opsflow/web",
+    "test": "npm run test -w @opsflow/domain && npm run test -w @opsflow/api && npm run test -w @opsflow/web",
+    "test:ci": "npm run test -- --run",
+    "typecheck": "npm run typecheck -w @opsflow/domain && npm run typecheck -w @opsflow/api && npm run typecheck -w @opsflow/web"
+  },
+  "devDependencies": {
+    "concurrently": "^9.2.1",
+    "typescript": "^6.0.3"
+  },
+  "engines": {
+    "node": ">=24"
+  }
+}

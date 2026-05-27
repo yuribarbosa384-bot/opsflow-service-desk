@@ -1,0 +1,10 @@
+node_modules
+dist
+coverage
+.env
+.env.local
+npm-debug.log*
+apps/api/data/runtime-tickets.json
+*.tsbuildinfo
+apps/**/src/**/*.js
+apps/**/vite.config.js
