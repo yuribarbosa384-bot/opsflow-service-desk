@@ -71,7 +71,7 @@ export function createApp(repository: TicketRepository) {
     const ticket = tickets.find((item) => item.id === req.params.id);
 
     if (!ticket) {
-      res.status(404).json({ error: "Tarefa nao encontrada" });
+      res.status(404).json({ error: "Tarefa não encontrada" });
       return;
     }
 
@@ -102,13 +102,13 @@ export function createApp(repository: TicketRepository) {
     const index = tickets.findIndex((ticket) => ticket.id === req.params.id);
 
     if (index === -1) {
-      res.status(404).json({ error: "Tarefa nao encontrada" });
+      res.status(404).json({ error: "Tarefa não encontrada" });
       return;
     }
 
     const current = tickets[index];
     if (!current) {
-      res.status(404).json({ error: "Tarefa nao encontrada" });
+      res.status(404).json({ error: "Tarefa não encontrada" });
       return;
     }
 
@@ -130,13 +130,13 @@ export function createApp(repository: TicketRepository) {
     const index = tickets.findIndex((ticket) => ticket.id === req.params.id);
 
     if (index === -1) {
-      res.status(404).json({ error: "Tarefa nao encontrada" });
+      res.status(404).json({ error: "Tarefa não encontrada" });
       return;
     }
 
     const current = tickets[index];
     if (!current) {
-      res.status(404).json({ error: "Tarefa nao encontrada" });
+      res.status(404).json({ error: "Tarefa não encontrada" });
       return;
     }
 
@@ -158,7 +158,7 @@ export function createApp(repository: TicketRepository) {
     const nextTickets = tickets.filter((ticket) => ticket.id !== req.params.id);
 
     if (nextTickets.length === tickets.length) {
-      res.status(404).json({ error: "Tarefa nao encontrada" });
+      res.status(404).json({ error: "Tarefa não encontrada" });
       return;
     }
 

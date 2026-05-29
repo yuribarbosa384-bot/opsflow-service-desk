@@ -113,6 +113,14 @@ export type TicketInsight = {
   severity: "info" | "warning" | "critical" | "success";
 };
 
+export type RiskLevel = "low" | "medium" | "high" | "critical";
+
+export type TicketRisk = {
+  score: number;
+  level: RiskLevel;
+  reasons: string[];
+};
+
 export function getSlaState(ticket: Ticket, now = new Date()): SlaState {
   if (ticket.status === "resolved") {
     return "done";
@@ -242,6 +250,61 @@ export function getTicketStats(tickets: Ticket[], now = new Date()): TicketStats
     byPriority,
     byCategory,
     byAssignee
+  };
+}
+
+export function getTicketRisk(ticket: Ticket, tickets: Ticket[], now = new Date()): TicketRisk {
+  if (ticket.status === "resolved") {
+    return {
+      score: 0,
+      level: "low",
+      reasons: ["Tarefa concluída"]
+    };
+  }
+
+  const reasons: string[] = [];
+  let score = 0;
+  const sla = getSlaState(ticket, now);
+  const assigneeOpen = tickets.filter((item) => item.status !== "resolved" && item.assignee === ticket.assignee).length;
+  const categoryOpen = tickets.filter((item) => item.status !== "resolved" && item.category === ticket.category).length;
+
+  if (sla === "breached") {
+    score += 3;
+    reasons.push("Prazo vencido");
+  } else if (sla === "at_risk" || isSameDay(new Date(ticket.dueAt), now)) {
+    score += 2;
+    reasons.push("Vence hoje ou está em risco");
+  }
+
+  if (ticket.priority === "urgent") {
+    score += 2;
+    reasons.push("Prioridade urgente");
+  } else if (ticket.priority === "high") {
+    score += 1;
+    reasons.push("Prioridade alta");
+  }
+
+  if (assigneeOpen >= 3) {
+    score += 1;
+    reasons.push("Responsável com alta carga");
+  }
+
+  if (categoryOpen >= 2) {
+    score += 1;
+    reasons.push("Categoria com gargalo");
+  }
+
+  if (ticket.status === "waiting") {
+    score += 1;
+    reasons.push("Aguardando retorno");
+  }
+
+  const level: RiskLevel = score >= 7 ? "critical" : score >= 5 ? "high" : score >= 3 ? "medium" : "low";
+
+  return {
+    score,
+    level,
+    reasons: reasons.length > 0 ? reasons : ["Sem risco imediato"]
   };
 }
 

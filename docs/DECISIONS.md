@@ -18,7 +18,7 @@ Express foi escolhido por permitir rotas claras, validação, tratamento de erro
 
 ## 5. UI operacional
 
-A interface foi pensada para rotina de trabalho: dashboard compacto, filtros por prazo e responsável, tabela escaneável, detalhe lateral e ações diretas. O foco é produtividade, não uma landing page.
+A interface foi pensada como um Command Center: navegação lateral, prioridade de hoje, score de risco, fila operacional, Kanban, relatórios e detalhe lateral. O foco é ajudar o usuário a decidir o que destrava a operação primeiro.
 
 ## 6. Testes
 
@@ -27,3 +27,7 @@ O projeto cobre três camadas:
 - regras de domínio com Vitest
 - endpoints da API com Supertest
 - formulário React com Testing Library
+
+## 7. Deploy
+
+A interface possui deploy estático no GitHub Pages com dados demonstrativos. A API Express e o SQLite continuam disponíveis localmente para demonstrar a arquitetura full stack e a persistência real.

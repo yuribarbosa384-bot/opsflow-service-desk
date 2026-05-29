@@ -2,6 +2,7 @@ import { describe, expect, it } from "vitest";
 import {
   filterTickets,
   getDueDateForPriority,
+  getTicketRisk,
   getSlaState,
   getTicketInsights,
   getTicketStats,
@@ -77,6 +78,20 @@ describe("ticket domain rules", () => {
 
     expect(insights.map((insight) => insight.id)).toContain("overdue");
     expect(insights.map((insight) => insight.id)).toContain("category");
+  });
+
+  it("scores operational risk from deadline, priority and bottlenecks", () => {
+    const tickets: Ticket[] = [
+      baseTicket,
+      { ...baseTicket, id: "ticket-2", priority: "urgent", status: "triage", dueAt: "2026-05-20T14:00:00.000Z" },
+      { ...baseTicket, id: "ticket-3", priority: "high", status: "waiting" }
+    ];
+
+    const risk = getTicketRisk(tickets[1]!, tickets, new Date("2026-05-21T12:00:00.000Z"));
+
+    expect(risk.score).toBeGreaterThanOrEqual(7);
+    expect(risk.level).toBe("critical");
+    expect(risk.reasons).toContain("Prazo vencido");
   });
 
   it("sets clear due dates based on priority", () => {

@@ -20,15 +20,23 @@
 
 ## Versão 0.3
 
+- Command Center com sidebar profissional
+- Score de risco operacional
+- Kanban por status
+- Relatórios por status, categoria e responsável
+- Demo estática no GitHub Pages
+
+## Versão 0.4
+
 - Histórico de eventos por tarefa
 - Comentários internos
 - Responsáveis cadastrados
 - Exportação CSV
 - Testes end-to-end
 
-## Versão 0.4
+## Versão 0.5
 
 - Autenticação
 - Perfis de acesso
-- Deploy público
+- Deploy público da API
 - Observabilidade básica

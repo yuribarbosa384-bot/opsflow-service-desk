@@ -1,4 +1,4 @@
-import type { DueState, SlaState, TicketCategory, TicketPriority, TicketStatus } from "@opsflow/domain";
+import type { DueState, RiskLevel, SlaState, TicketCategory, TicketPriority, TicketStatus } from "@opsflow/domain";
 
 export const statusLabel: Record<TicketStatus, string> = {
   backlog: "Pendente",
@@ -36,6 +36,13 @@ export const dueLabel: Record<DueState, string> = {
   week: "Vencem em 7 dias"
 };
 
+export const riskLabel: Record<RiskLevel, string> = {
+  low: "Baixo",
+  medium: "Médio",
+  high: "Alto",
+  critical: "Crítico"
+};
+
 export function formatDateTime(value: string): string {
   return new Intl.DateTimeFormat("pt-BR", {
     day: "2-digit",
@@ -64,4 +71,13 @@ export function getSlaClass(state: SlaState): string {
     breached: "bg-rose-50 text-rose-800",
     done: "bg-slate-100 text-slate-700"
   }[state];
+}
+
+export function getRiskClass(level: RiskLevel): string {
+  return {
+    low: "bg-emerald-50 text-emerald-800",
+    medium: "bg-amber-50 text-amber-800",
+    high: "bg-orange-50 text-orange-800",
+    critical: "bg-rose-50 text-rose-800"
+  }[level];
 }

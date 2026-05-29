@@ -1,14 +1,25 @@
 import { Clock3 } from "lucide-react";
-import { getSlaState, type Ticket } from "@opsflow/domain";
-import { categoryLabel, formatDateTime, getPriorityClass, getSlaClass, priorityLabel, slaLabel, statusLabel } from "../lib/format";
+import { getSlaState, getTicketRisk, type Ticket } from "@opsflow/domain";
+import {
+  categoryLabel,
+  formatDateTime,
+  getPriorityClass,
+  getRiskClass,
+  getSlaClass,
+  priorityLabel,
+  riskLabel,
+  slaLabel,
+  statusLabel
+} from "../lib/format";
 
 type TicketTableProps = {
   tickets: Ticket[];
+  allTickets: Ticket[];
   selectedId?: string;
   onSelect: (ticket: Ticket) => void;
 };
 
-export function TicketTable({ tickets, selectedId, onSelect }: TicketTableProps) {
+export function TicketTable({ tickets, allTickets, selectedId, onSelect }: TicketTableProps) {
   return (
     <section className="overflow-hidden rounded-md border border-slate-200 bg-white shadow-sm">
       <div className="border-b border-slate-200 px-4 py-3">
@@ -16,7 +27,7 @@ export function TicketTable({ tickets, selectedId, onSelect }: TicketTableProps)
       </div>
 
       <div className="overflow-x-auto">
-        <table className="w-full min-w-[760px] border-collapse text-left text-sm">
+        <table className="w-full min-w-[900px] border-collapse text-left text-sm">
           <thead className="bg-slate-50 text-xs uppercase text-slate-500">
             <tr>
               <th className="px-3 py-3 font-semibold">Tarefa</th>
@@ -25,6 +36,7 @@ export function TicketTable({ tickets, selectedId, onSelect }: TicketTableProps)
               <th className="px-3 py-3 font-semibold">Categoria</th>
               <th className="px-3 py-3 font-semibold">Status</th>
               <th className="px-3 py-3 font-semibold">Prioridade</th>
+              <th className="px-3 py-3 font-semibold">Risco</th>
               <th className="px-3 py-3 font-semibold">Prazo</th>
               <th className="px-3 py-3 font-semibold">Entrega</th>
             </tr>
@@ -32,6 +44,7 @@ export function TicketTable({ tickets, selectedId, onSelect }: TicketTableProps)
           <tbody className="divide-y divide-slate-100">
             {tickets.map((ticket) => {
               const sla = getSlaState(ticket);
+              const risk = getTicketRisk(ticket, allTickets);
               const isSelected = ticket.id === selectedId;
 
               return (
@@ -58,6 +71,11 @@ export function TicketTable({ tickets, selectedId, onSelect }: TicketTableProps)
                   <td className="px-3 py-3">
                     <span className={`rounded-sm px-2 py-1 text-xs font-semibold ${getPriorityClass(ticket.priority)}`}>
                       {priorityLabel[ticket.priority]}
+                    </span>
+                  </td>
+                  <td className="px-3 py-3">
+                    <span className={`rounded-sm px-2 py-1 text-xs font-semibold ${getRiskClass(risk.level)}`}>
+                      {riskLabel[risk.level]} · {risk.score}
                     </span>
                   </td>
                   <td className="px-3 py-3">

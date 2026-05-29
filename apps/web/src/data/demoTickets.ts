@@ -1,0 +1,80 @@
+import type { Ticket } from "@opsflow/domain";
+
+export const demoTickets: Ticket[] = [
+  {
+    id: "tk-1001",
+    title: "Validar documentos pendentes do processo seletivo",
+    requester: "RH",
+    department: "Recursos Humanos",
+    category: "documentation",
+    priority: "high",
+    status: "in_progress",
+    assignee: "Yuri Barbosa",
+    description: "Conferir documentos obrigatórios, apontar pendências e evitar atraso na contratação.",
+    tags: ["documentos", "admissão", "rh"],
+    createdAt: "2026-05-27T12:00:00.000Z",
+    updatedAt: "2026-05-28T10:00:00.000Z",
+    dueAt: "2026-05-29T18:00:00.000Z"
+  },
+  {
+    id: "tk-1002",
+    title: "Conferir planilha de contratos vencendo",
+    requester: "Financeiro",
+    department: "Financeiro",
+    category: "data",
+    priority: "urgent",
+    status: "triage",
+    assignee: "Ana Lima",
+    description: "Cruzar contratos, datas de vencimento e responsáveis para priorizar renovações críticas.",
+    tags: ["contratos", "planilha", "prazo"],
+    createdAt: "2026-05-28T09:30:00.000Z",
+    updatedAt: "2026-05-28T09:30:00.000Z",
+    dueAt: "2026-05-29T12:00:00.000Z"
+  },
+  {
+    id: "tk-1003",
+    title: "Automatizar alerta de notas fiscais sem aprovação",
+    requester: "Contas a Pagar",
+    department: "Financeiro",
+    category: "automation",
+    priority: "high",
+    status: "waiting",
+    assignee: "Yuri Barbosa",
+    description: "Criar fluxo para identificar notas paradas, notificar responsáveis e reduzir retrabalho manual.",
+    tags: ["automação", "financeiro", "aprovação"],
+    createdAt: "2026-05-26T14:00:00.000Z",
+    updatedAt: "2026-05-28T08:20:00.000Z",
+    dueAt: "2026-05-30T18:00:00.000Z"
+  },
+  {
+    id: "tk-1004",
+    title: "Padronizar cadastro de fornecedores",
+    requester: "Compras",
+    department: "Suprimentos",
+    category: "data",
+    priority: "medium",
+    status: "backlog",
+    assignee: "Carlos Lima",
+    description: "Definir campos obrigatórios e validações para reduzir inconsistências no cadastro.",
+    tags: ["cadastro", "fornecedores", "dados"],
+    createdAt: "2026-05-25T13:00:00.000Z",
+    updatedAt: "2026-05-25T13:00:00.000Z",
+    dueAt: "2026-06-02T18:00:00.000Z"
+  },
+  {
+    id: "tk-1005",
+    title: "Criar checklist de fechamento mensal",
+    requester: "Operações",
+    department: "Operações",
+    category: "documentation",
+    priority: "low",
+    status: "resolved",
+    assignee: "Renata Lima",
+    description: "Checklist para reduzir esquecimentos no fechamento mensal e facilitar conferência do gestor.",
+    tags: ["checklist", "operação", "qualidade"],
+    createdAt: "2026-05-20T11:00:00.000Z",
+    updatedAt: "2026-05-24T16:00:00.000Z",
+    dueAt: "2026-05-27T18:00:00.000Z",
+    resolution: "Checklist publicado e validado com a equipe administrativa."
+  }
+];
