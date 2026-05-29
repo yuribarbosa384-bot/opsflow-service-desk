@@ -1,27 +1,34 @@
 # Roadmap
 
-## Versao 0.1
+## Versão 0.1
 
 - Dashboard com indicadores de fila
 - Filtros por busca, status, prioridade e categoria
-- Criacao de chamados
-- Atualizacao de status
+- Criação de tarefas
+- Atualização de status
 - API REST com validação
-- Testes de dominio, API e formulario
+- Testes de domínio, API e formulário
 - CI com GitHub Actions
 
-## Versao 0.2
+## Versão 0.2
 
-- Histórico de eventos por chamado
+- Banco SQLite local
+- Edição completa de tarefas
+- Exclusão com confirmação
+- Filtros por responsável, mês e prazo
+- Insights operacionais por gargalo, prazo e responsável
+
+## Versão 0.3
+
+- Histórico de eventos por tarefa
 - Comentários internos
-- Responsaveis cadastrados
-- Exportacao CSV
-- Screenshots no README
-
-## Versao 0.3
-
-- Autenticacao
-- Banco SQLite ou Postgres
-- Deploy
-- Observabilidade basica
+- Responsáveis cadastrados
+- Exportação CSV
 - Testes end-to-end
+
+## Versão 0.4
+
+- Autenticação
+- Perfis de acesso
+- Deploy público
+- Observabilidade básica

@@ -1,6 +1,6 @@
 import { Clock3 } from "lucide-react";
 import { getSlaState, type Ticket } from "@opsflow/domain";
-import { formatDateTime, getPriorityClass, getSlaClass, priorityLabel, slaLabel, statusLabel } from "../lib/format";
+import { categoryLabel, formatDateTime, getPriorityClass, getSlaClass, priorityLabel, slaLabel, statusLabel } from "../lib/format";
 
 type TicketTableProps = {
   tickets: Ticket[];
@@ -12,19 +12,21 @@ export function TicketTable({ tickets, selectedId, onSelect }: TicketTableProps)
   return (
     <section className="overflow-hidden rounded-md border border-slate-200 bg-white shadow-sm">
       <div className="border-b border-slate-200 px-4 py-3">
-        <h2 className="text-sm font-semibold text-slate-950">Fila de chamados</h2>
+        <h2 className="text-sm font-semibold text-slate-950">Fila de tarefas administrativas</h2>
       </div>
 
       <div className="overflow-x-auto">
         <table className="w-full min-w-[760px] border-collapse text-left text-sm">
           <thead className="bg-slate-50 text-xs uppercase text-slate-500">
             <tr>
-              <th className="px-3 py-3 font-semibold">Chamado</th>
+              <th className="px-3 py-3 font-semibold">Tarefa</th>
               <th className="px-3 py-3 font-semibold">Solicitante</th>
+              <th className="px-3 py-3 font-semibold">Responsável</th>
+              <th className="px-3 py-3 font-semibold">Categoria</th>
               <th className="px-3 py-3 font-semibold">Status</th>
               <th className="px-3 py-3 font-semibold">Prioridade</th>
-              <th className="px-3 py-3 font-semibold">SLA</th>
-              <th className="px-3 py-3 font-semibold">Vencimento</th>
+              <th className="px-3 py-3 font-semibold">Prazo</th>
+              <th className="px-3 py-3 font-semibold">Entrega</th>
             </tr>
           </thead>
           <tbody className="divide-y divide-slate-100">
@@ -50,6 +52,8 @@ export function TicketTable({ tickets, selectedId, onSelect }: TicketTableProps)
                     <div>{ticket.requester}</div>
                     <div className="text-xs text-slate-500">{ticket.department}</div>
                   </td>
+                  <td className="px-3 py-3 text-slate-700">{ticket.assignee}</td>
+                  <td className="px-3 py-3 text-slate-700">{categoryLabel[ticket.category]}</td>
                   <td className="px-3 py-3 text-slate-700">{statusLabel[ticket.status]}</td>
                   <td className="px-3 py-3">
                     <span className={`rounded-sm px-2 py-1 text-xs font-semibold ${getPriorityClass(ticket.priority)}`}>

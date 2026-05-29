@@ -2,7 +2,7 @@
   "name": "opsflow-service-desk",
   "version": "0.1.0",
   "private": true,
-  "description": "Full-stack service desk para demonstrar React, TypeScript, API, validação, testes e documentação de produto.",
+  "description": "Sistema administrativo full stack com React, TypeScript, API, SQLite, validação, testes e documentação de produto.",
   "type": "module",
   "workspaces": [
     "apps/*",

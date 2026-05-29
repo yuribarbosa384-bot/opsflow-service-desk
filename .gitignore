@@ -5,6 +5,9 @@ coverage
 .env.local
 npm-debug.log*
 apps/api/data/runtime-tickets.json
+apps/api/data/*.sqlite
+apps/api/data/*.sqlite-shm
+apps/api/data/*.sqlite-wal
 *.tsbuildinfo
 apps/**/src/**/*.js
 apps/**/vite.config.js

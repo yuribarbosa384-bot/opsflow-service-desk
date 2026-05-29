@@ -1,34 +1,51 @@
-import type { SlaState, TicketPriority, TicketStatus } from "@opsflow/domain";
+import type { DueState, SlaState, TicketCategory, TicketPriority, TicketStatus } from "@opsflow/domain";
 
 export const statusLabel: Record<TicketStatus, string> = {
-  backlog: "Backlog",
+  backlog: "Pendente",
   triage: "Triagem",
   in_progress: "Em andamento",
-  waiting: "Aguardando",
-  resolved: "Resolvido"
+  waiting: "Aguardando retorno",
+  resolved: "Concluído"
 };
 
 export const priorityLabel: Record<TicketPriority, string> = {
   low: "Baixa",
-  medium: "Media",
+  medium: "Média",
   high: "Alta",
   urgent: "Urgente"
+};
+
+export const categoryLabel: Record<TicketCategory, string> = {
+  access: "Acessos",
+  documentation: "Documentos",
+  automation: "Automação",
+  data: "Dados",
+  incident: "Incidentes"
 };
 
 export const slaLabel: Record<SlaState, string> = {
   healthy: "Dentro do prazo",
   at_risk: "Em risco",
   breached: "Vencido",
-  done: "Concluido"
+  done: "Concluído"
+};
+
+export const dueLabel: Record<DueState, string> = {
+  overdue: "Vencidas",
+  today: "Vencem hoje",
+  week: "Vencem em 7 dias"
 };
 
 export function formatDateTime(value: string): string {
   return new Intl.DateTimeFormat("pt-BR", {
     day: "2-digit",
     month: "2-digit",
-    hour: "2-digit",
-    minute: "2-digit"
+    year: "numeric"
   }).format(new Date(value));
+}
+
+export function formatDateInput(value: string): string {
+  return value.slice(0, 10);
 }
 
 export function getPriorityClass(priority: TicketPriority): string {

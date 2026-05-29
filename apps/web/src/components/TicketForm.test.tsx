@@ -10,17 +10,18 @@ describe("TicketForm", () => {
 
     render(<TicketForm onSubmit={onSubmit} onCancel={() => undefined} />);
 
-    await user.type(screen.getByLabelText("Titulo"), "Padronizar cadastro de lotes");
+    await user.type(screen.getByLabelText("Título"), "Padronizar cadastro de lotes");
     await user.type(screen.getByLabelText("Solicitante"), "Aline Ribeiro");
-    await user.type(screen.getByLabelText("Area"), "Operacoes");
-    await user.type(screen.getByLabelText("Descricao"), "Criar padrao de cadastro para reduzir erros de digitacao.");
+    await user.type(screen.getByLabelText("Área"), "Operações");
+    await user.type(screen.getByLabelText("Descrição"), "Criar padrão de cadastro para reduzir erros de digitação.");
     await user.type(screen.getByLabelText("Tags"), "dados, excel");
-    await user.click(screen.getByRole("button", { name: "Criar chamado" }));
+    await user.click(screen.getByRole("button", { name: "Criar tarefa" }));
 
     expect(onSubmit).toHaveBeenCalledWith(expect.objectContaining({
       title: "Padronizar cadastro de lotes",
       requester: "Aline Ribeiro",
-      department: "Operacoes",
+      department: "Operações",
+      assignee: "Yuri Barbosa",
       tags: ["dados", "excel"]
     }));
   });

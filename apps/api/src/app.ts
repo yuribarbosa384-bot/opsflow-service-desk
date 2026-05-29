@@ -5,8 +5,10 @@ import {
   createTicketSchema,
   filterTickets,
   getDueDateForPriority,
+  getTicketInsights,
   getTicketStats,
   ticketFilterSchema,
+  updateTicketSchema,
   updateStatusSchema,
   type Ticket,
   type TicketFilters
@@ -44,6 +46,11 @@ export function createApp(repository: TicketRepository) {
     res.json({ data: getTicketStats(tickets) });
   }));
 
+  app.get("/api/insights", asyncRoute(async (_req, res) => {
+    const tickets = await repository.findAll();
+    res.json({ data: getTicketInsights(tickets) });
+  }));
+
   app.get("/api/tickets", asyncRoute(async (req, res) => {
     const filters = normalizeFilters(req.query);
     const tickets = await repository.findAll();
@@ -64,7 +71,7 @@ export function createApp(repository: TicketRepository) {
     const ticket = tickets.find((item) => item.id === req.params.id);
 
     if (!ticket) {
-      res.status(404).json({ error: "Ticket not found" });
+      res.status(404).json({ error: "Tarefa nao encontrada" });
       return;
     }
 
@@ -82,7 +89,7 @@ export function createApp(repository: TicketRepository) {
       status: "triage",
       createdAt: now.toISOString(),
       updatedAt: now.toISOString(),
-      dueAt: getDueDateForPriority(input.priority, now)
+      dueAt: input.dueAt ?? getDueDateForPriority(input.priority, now)
     };
 
     await repository.replaceAll([ticket, ...tickets]);
@@ -95,13 +102,13 @@ export function createApp(repository: TicketRepository) {
     const index = tickets.findIndex((ticket) => ticket.id === req.params.id);
 
     if (index === -1) {
-      res.status(404).json({ error: "Ticket not found" });
+      res.status(404).json({ error: "Tarefa nao encontrada" });
       return;
     }
 
     const current = tickets[index];
     if (!current) {
-      res.status(404).json({ error: "Ticket not found" });
+      res.status(404).json({ error: "Tarefa nao encontrada" });
       return;
     }
 
@@ -115,6 +122,48 @@ export function createApp(repository: TicketRepository) {
     tickets[index] = updated;
     await repository.replaceAll(tickets);
     res.json({ data: updated });
+  }));
+
+  app.put("/api/tickets/:id", asyncRoute(async (req, res) => {
+    const input = updateTicketSchema.parse(req.body);
+    const tickets = await repository.findAll();
+    const index = tickets.findIndex((ticket) => ticket.id === req.params.id);
+
+    if (index === -1) {
+      res.status(404).json({ error: "Tarefa nao encontrada" });
+      return;
+    }
+
+    const current = tickets[index];
+    if (!current) {
+      res.status(404).json({ error: "Tarefa nao encontrada" });
+      return;
+    }
+
+    const updated: Ticket = {
+      ...current,
+      ...input,
+      tags: input.tags ?? current.tags,
+      resolution: input.resolution ?? current.resolution,
+      updatedAt: new Date().toISOString()
+    };
+
+    tickets[index] = updated;
+    await repository.replaceAll(tickets);
+    res.json({ data: updated });
+  }));
+
+  app.delete("/api/tickets/:id", asyncRoute(async (req, res) => {
+    const tickets = await repository.findAll();
+    const nextTickets = tickets.filter((ticket) => ticket.id !== req.params.id);
+
+    if (nextTickets.length === tickets.length) {
+      res.status(404).json({ error: "Tarefa nao encontrada" });
+      return;
+    }
+
+    await repository.replaceAll(nextTickets);
+    res.status(204).send();
   }));
 
   app.use((error: unknown, _req: Request, res: Response, _next: NextFunction) => {

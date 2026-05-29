@@ -1,5 +1,12 @@
 import { describe, expect, it } from "vitest";
-import { filterTickets, getDueDateForPriority, getSlaState, getTicketStats, type Ticket } from "./index";
+import {
+  filterTickets,
+  getDueDateForPriority,
+  getSlaState,
+  getTicketInsights,
+  getTicketStats,
+  type Ticket
+} from "./index";
 
 const baseTicket: Ticket = {
   id: "ticket-1",
@@ -32,6 +39,11 @@ describe("ticket domain rules", () => {
     ];
 
     expect(filterTickets(tickets, { q: "contratos" })).toHaveLength(1);
+    expect(filterTickets(tickets, { q: "maio" })).toHaveLength(2);
+    expect(filterTickets(tickets, { q: "22/05/2026" })).toHaveLength(2);
+    expect(filterTickets(tickets, { assignee: "yuri" })).toHaveLength(2);
+    expect(filterTickets(tickets, { month: "2026-05" })).toHaveLength(2);
+    expect(filterTickets(tickets, { due: "overdue" })).toHaveLength(2);
     expect(filterTickets(tickets, { category: "access" })).toHaveLength(1);
     expect(filterTickets(tickets, { priority: "urgent" })).toHaveLength(0);
   });
@@ -50,6 +62,21 @@ describe("ticket domain rules", () => {
     expect(stats.resolved).toBe(1);
     expect(stats.urgent).toBe(1);
     expect(stats.breached).toBe(1);
+    expect(stats.completionRate).toBe(33);
+    expect(stats.byCategory.automation).toBe(3);
+    expect(stats.byAssignee["Yuri Barbosa"]).toBe(2);
+  });
+
+  it("generates operational insights from queue data", () => {
+    const insights = getTicketInsights([
+      baseTicket,
+      { ...baseTicket, id: "ticket-2", priority: "urgent", status: "triage", dueAt: "2026-05-20T14:00:00.000Z" },
+      { ...baseTicket, id: "ticket-3", priority: "medium", status: "waiting" },
+      { ...baseTicket, id: "ticket-4", priority: "low", status: "resolved" }
+    ], new Date("2026-05-21T12:00:00.000Z"));
+
+    expect(insights.map((insight) => insight.id)).toContain("overdue");
+    expect(insights.map((insight) => insight.id)).toContain("category");
   });
 
   it("sets clear due dates based on priority", () => {

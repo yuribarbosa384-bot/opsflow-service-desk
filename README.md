@@ -1,8 +1,8 @@
-# OpsFlow Service Desk
+# OpsFlow Administrativo
 
-Sistema full stack de service desk operacional para controlar chamados, prioridade, SLA e status de atendimento.
+Sistema full stack para gestão de tarefas administrativas com dashboard, banco SQLite, filtros inteligentes, criação, edição, exclusão e leitura de gargalos operacionais.
 
-O projeto apresenta um fluxo completo de produto: interface, API, validação, regras de negócio, testes automatizados, CI e documentação técnica.
+O projeto foi construído para demonstrar capacidade de transformar uma rotina comum de trabalho em produto: modelagem de dados, API, interface, validação, testes automatizados, documentação técnica e decisões de arquitetura.
 
 Repositório: https://github.com/yuribarbosa384-bot/opsflow-service-desk
 
@@ -10,27 +10,35 @@ Repositório: https://github.com/yuribarbosa384-bot/opsflow-service-desk
 
 ## Problema
 
-Equipes administrativas e operacionais costumam acompanhar demandas em planilhas, mensagens soltas e controles paralelos. O OpsFlow centraliza a fila de chamados e ajuda a priorizar o que está urgente, vencido ou em risco.
+Equipes administrativas e operacionais costumam acompanhar demandas em planilhas, mensagens soltas e controles paralelos. Isso dificulta saber quem é responsável por cada tarefa, quais prazos estão vencendo, onde há gargalo e quais demandas deveriam ser priorizadas.
+
+O OpsFlow centraliza esse fluxo em uma aplicação web com banco local, dashboard e filtros por status, categoria, responsável, mês e prazo.
 
 ## Stack
 
 - React 19, TypeScript, Vite e Tailwind CSS
 - Express 5 com API REST
+- SQLite local usando `node:sqlite`
 - Zod para contratos e validação
 - Vitest, Testing Library e Supertest
 - GitHub Actions para CI
-- Persistência local em JSON para facilitar execução e avaliação
+- Monorepo com web, API e pacote de domínio compartilhado
 
 ## O que este projeto demonstra
 
 - Modelagem de domínio com tipos e validação compartilhados
-- API com rotas, filtros, criação e atualização de status
-- Interface responsiva com dashboard, filtros, tabela e painel de detalhe
+- Banco SQLite com seed, índices e persistência local
+- API REST com listagem, filtros, criação, edição, atualização de status e exclusão
+- Busca por título, descrição, responsável, categoria, status, datas e mês
+- Dashboard com taxa de conclusão, tarefas vencidas, urgentes e em risco
+- Insights operacionais para identificar gargalos por categoria, responsável e prazo
+- Interface responsiva com tabela, painel de detalhe, formulário e confirmação de exclusão
 - Testes de regra de negócio, API e formulário
 - Documentação de produto, decisões técnicas e roadmap
-- Estrutura de monorepo com apps e pacote compartilhado
 
 ## Como rodar
+
+Requisito: Node.js 24 ou superior.
 
 ```bash
 npm install
@@ -54,12 +62,15 @@ npm run build
 ## API
 
 ```text
-GET    /health
-GET    /api/analytics
-GET    /api/tickets
-GET    /api/tickets/:id
-POST   /api/tickets
-PATCH  /api/tickets/:id/status
+GET     /health
+GET     /api/analytics
+GET     /api/insights
+GET     /api/tickets
+GET     /api/tickets/:id
+POST    /api/tickets
+PUT     /api/tickets/:id
+PATCH   /api/tickets/:id/status
+DELETE  /api/tickets/:id
 ```
 
 Filtros disponíveis em `GET /api/tickets`:
@@ -69,25 +80,30 @@ q
 status
 priority
 category
+assignee
+month
+due
 ```
 
 ## Estudo de caso
 
 ### Contexto
 
-O projeto parte de uma dor comum em rotinas administrativas: acompanhar documentos, contratos, acessos e tarefas internas sem perder prazo.
+O projeto parte de uma dor real em rotinas administrativas: acompanhar documentos, acessos, contratos, relatórios e tarefas internas sem perder prazo nem depender de planilhas descentralizadas.
 
 ### Decisões principais
 
 - O domínio fica em `packages/domain` para que API e web usem as mesmas regras.
 - A API valida entrada com Zod antes de persistir dados.
-- A interface prioriza leitura rápida, status e SLA, porque o usuário operacional precisa decidir rápido.
-- A persistência local em JSON mantém o projeto simples de executar em uma avaliação técnica.
+- O SQLite deixa o projeto simples de rodar e, ao mesmo tempo, demonstra modelagem com banco real.
+- A interface prioriza leitura rápida, status, responsável e prazo porque o usuário operacional precisa decidir o que fazer primeiro.
+- A confirmação de exclusão evita perda acidental de dados.
 
 ### Evoluções planejadas
 
-- Autenticação por usuário e perfis de acesso
-- Banco SQLite ou Postgres
-- Histórico de eventos por chamado
-- Deploy da web e API
-- Screenshots do produto no README
+- Histórico de eventos por tarefa
+- Comentários internos
+- Autenticação e perfis de acesso
+- Exportação CSV
+- Deploy público da web e API
+- Testes end-to-end

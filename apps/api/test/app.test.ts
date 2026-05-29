@@ -34,10 +34,19 @@ describe("OpsFlow API", () => {
   it("filters ticket queue", async () => {
     const app = createApp(createMemoryRepository(tickets));
 
-    const response = await request(app).get("/api/tickets?q=contratos").expect(200);
+    const response = await request(app).get("/api/tickets?q=contratos&assignee=Yuri&month=2026-05").expect(200);
 
     expect(response.body.data).toHaveLength(1);
     expect(response.body.data[0].title).toContain("contratos");
+  });
+
+  it("returns dashboard insights", async () => {
+    const app = createApp(createMemoryRepository(tickets));
+
+    const response = await request(app).get("/api/insights").expect(200);
+
+    expect(response.body.data.length).toBeGreaterThan(0);
+    expect(response.body.data[0]).toHaveProperty("title");
   });
 
   it("validates and creates a new ticket", async () => {
@@ -48,17 +57,34 @@ describe("OpsFlow API", () => {
       .send({
         title: "Padronizar cadastro de lotes",
         requester: "Aline Ribeiro",
-        department: "Operacoes",
+        department: "Operações",
         category: "data",
         priority: "medium",
         assignee: "Yuri Barbosa",
-        description: "Criar padrao de cadastro para reduzir erros de digitacao.",
+        description: "Criar padrão de cadastro para reduzir erros de digitação.",
         tags: ["dados"]
       })
       .expect(201);
 
     expect(response.body.data.id).toMatch(/^tk-/);
     expect(response.body.data.status).toBe("triage");
+  });
+
+  it("edits a task", async () => {
+    const app = createApp(createMemoryRepository(tickets));
+
+    const response = await request(app)
+      .put("/api/tickets/tk-test-1")
+      .send({
+        title: "Automatizar painel administrativo",
+        status: "waiting",
+        assignee: "Carlos Lima"
+      })
+      .expect(200);
+
+    expect(response.body.data.title).toBe("Automatizar painel administrativo");
+    expect(response.body.data.status).toBe("waiting");
+    expect(response.body.data.assignee).toBe("Carlos Lima");
   });
 
   it("updates ticket status", async () => {
@@ -71,5 +97,14 @@ describe("OpsFlow API", () => {
 
     expect(response.body.data.status).toBe("resolved");
     expect(response.body.data.resolution).toContain("Fluxo");
+  });
+
+  it("deletes a task with confirmation support", async () => {
+    const app = createApp(createMemoryRepository(tickets));
+
+    await request(app).delete("/api/tickets/tk-test-1").expect(204);
+
+    const response = await request(app).get("/api/tickets").expect(200);
+    expect(response.body.data).toHaveLength(0);
   });
 });
