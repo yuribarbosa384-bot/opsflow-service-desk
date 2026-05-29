@@ -12,3 +12,5 @@ apps/api/data/*.sqlite-wal
 apps/**/src/**/*.js
 apps/**/vite.config.js
 dev-server*.log
+playwright-report
+test-results

@@ -25,14 +25,17 @@
 - Kanban por status
 - Relatórios por status, categoria e responsável
 - Demo estática no GitHub Pages
+- Filtros compartilháveis por URL
+- Exportação CSV da fila
+- Teste end-to-end do fluxo crítico
 
 ## Versão 0.4
 
 - Histórico de eventos por tarefa
 - Comentários internos
 - Responsáveis cadastrados
-- Exportação CSV
-- Testes end-to-end
+- Sugestão de rebalanceamento por responsável
+- Relatório mensal consolidado
 
 ## Versão 0.5
 

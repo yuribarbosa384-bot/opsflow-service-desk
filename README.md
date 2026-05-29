@@ -1,8 +1,14 @@
 # OpsFlow Administrativo
 
+![CI](https://github.com/yuribarbosa384-bot/opsflow-service-desk/actions/workflows/ci.yml/badge.svg)
+![Pages](https://github.com/yuribarbosa384-bot/opsflow-service-desk/actions/workflows/pages.yml/badge.svg)
+![CodeQL](https://github.com/yuribarbosa384-bot/opsflow-service-desk/actions/workflows/codeql.yml/badge.svg)
+
 Sistema full stack para priorizar demandas administrativas, detectar gargalos e controlar prazos críticos.
 
 [Demo online](https://yuribarbosa384-bot.github.io/opsflow-service-desk/) · [Repositório](https://github.com/yuribarbosa384-bot/opsflow-service-desk)
+
+![Fluxo do OpsFlow](docs/assets/opsflow-flow.gif)
 
 ![Visão geral do OpsFlow](docs/screenshots/overview.png)
 
@@ -22,10 +28,12 @@ O OpsFlow organiza esse fluxo em um Command Center com dashboard, score de risco
 - Dashboard com tarefas abertas, conclusão, urgentes, vencidas e em risco
 - Prioridade automática por score de risco
 - Filtros por busca, status, prioridade, categoria, responsável, mês e prazo
+- URL compartilhável para filtros ativos
 - Chips de filtros ativos e ação para limpar filtros
 - Fila operacional com painel lateral de detalhe
 - Kanban por etapa do fluxo
 - Relatórios simples por status, categoria e responsável
+- Exportação CSV da fila filtrada
 - CRUD completo de tarefas
 - Confirmação antes de excluir
 - Demo pública com dados demonstrativos
@@ -53,6 +61,20 @@ Essa regra transforma a aplicação em um painel de decisão, não apenas uma li
 - GitHub Actions para CI e deploy no GitHub Pages
 - Monorepo com web, API e pacote de domínio compartilhado
 
+## Arquitetura
+
+```mermaid
+flowchart LR
+  Web["React / Vite"] --> Domain["Pacote de domínio"]
+  Api["Express API"] --> Domain
+  Api --> Db["SQLite local"]
+  Pages["GitHub Pages demo"] --> Demo["Dados demonstrativos"]
+```
+
+Decisão técnica documentada: [ADR-001](docs/ADR-001-command-center-architecture.md).
+
+Guia de demo, GitHub Pages, API local e ngrok: [docs/DEPLOYMENT_GUIDE.md](docs/DEPLOYMENT_GUIDE.md).
+
 ## Como rodar
 
 Requisito: Node.js 24 ou superior.
@@ -75,8 +97,19 @@ A demo online roda como frontend estático com dados demonstrativos. Para avalia
 ```bash
 npm run typecheck
 npm run test
+npm run test:e2e
 npm run build
 ```
+
+## Qualidade e segurança
+
+- CI com typecheck, testes e build em `main` e pull requests
+- Playwright E2E cobrindo criação, filtro, edição e exclusão de tarefa
+- Deploy automatizado do frontend estático no GitHub Pages
+- CodeQL para análise estática de JavaScript e TypeScript
+- Dependabot para npm e GitHub Actions
+- Dependency Review para revisar mudanças de dependências em pull requests
+- Release notes em [docs/RELEASE_NOTES.md](docs/RELEASE_NOTES.md)
 
 ## API
 
@@ -113,6 +146,7 @@ due
 - Testes de regra de negócio, API e formulário
 - CI com typecheck, testes e build
 - Deploy estático com GitHub Pages
+- Filtros compartilháveis e exportação CSV para aproximar o projeto de uma rotina administrativa real
 
 ## Evoluções planejadas
 

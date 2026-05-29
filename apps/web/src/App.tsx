@@ -2,8 +2,10 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import {
   AlertTriangle,
   BarChart3,
+  Check,
   CheckCircle2,
   ClipboardList,
+  Download,
   FilterX,
   Gauge,
   LayoutDashboard,
@@ -13,6 +15,7 @@ import {
   Pencil,
   Plus,
   RefreshCcw,
+  Share2,
   ShieldAlert,
   Target,
   Trash2,
@@ -20,14 +23,18 @@ import {
   X
 } from "lucide-react";
 import {
+  dueStates,
   getTicketRisk,
   ticketCategories,
+  ticketPriorities,
   ticketStatuses,
   type CreateTicketInput,
+  type DueState,
   type Ticket,
   type TicketCategory,
   type TicketFilters,
   type TicketInsight,
+  type TicketPriority,
   type TicketStats,
   type TicketStatus,
   type UpdateTicketInput
@@ -88,6 +95,8 @@ const navItems: Array<{ id: ViewMode; label: string; icon: typeof LayoutDashboar
   { id: "reports", label: "Relatórios", icon: BarChart3 }
 ];
 
+const filterKeys: Array<keyof TicketFilters> = ["q", "status", "priority", "category", "assignee", "month", "due"];
+
 const insightClass: Record<TicketInsight["severity"], string> = {
   info: "border-slate-200 bg-white text-slate-800",
   warning: "border-amber-200 bg-amber-50 text-amber-950",
@@ -98,6 +107,85 @@ const insightClass: Record<TicketInsight["severity"], string> = {
 function formatMonth(value: string): string {
   const [year, month] = value.split("-").map(Number);
   return new Intl.DateTimeFormat("pt-BR", { month: "long", year: "numeric" }).format(new Date(year ?? 2026, (month ?? 1) - 1, 1));
+}
+
+function readFiltersFromUrl(): TicketFilters {
+  if (typeof window === "undefined") {
+    return {};
+  }
+
+  const params = new URLSearchParams(window.location.search);
+  const status = params.get("status");
+  const priority = params.get("priority");
+  const category = params.get("category");
+  const due = params.get("due");
+  const month = params.get("month");
+  const priorityValue = priority as TicketPriority;
+  const dueValue = due as DueState;
+
+  return {
+    q: params.get("q") || undefined,
+    status: ticketStatuses.includes(status as TicketStatus) ? status as TicketFilters["status"] : undefined,
+    priority: priority && ticketPriorities.includes(priorityValue) ? priorityValue : undefined,
+    category: ticketCategories.includes(category as TicketCategory) ? category as TicketFilters["category"] : undefined,
+    assignee: params.get("assignee") || undefined,
+    month: month && /^\d{4}-\d{2}$/.test(month) ? month : undefined,
+    due: due && dueStates.includes(dueValue) ? dueValue : undefined
+  };
+}
+
+function syncFiltersToUrl(filters: TicketFilters) {
+  if (typeof window === "undefined") {
+    return;
+  }
+
+  const params = new URLSearchParams(window.location.search);
+  for (const key of filterKeys) {
+    params.delete(key);
+    const value = filters[key];
+    if (value) {
+      params.set(key, value);
+    }
+  }
+
+  const query = params.toString();
+  const nextUrl = `${window.location.pathname}${query ? `?${query}` : ""}${window.location.hash}`;
+  window.history.replaceState(null, "", nextUrl);
+}
+
+function escapeCsv(value: string | number): string {
+  const text = String(value);
+  return `"${text.replace(/"/g, '""')}"`;
+}
+
+function buildTicketsCsv(tickets: Ticket[]): string {
+  const headers = ["Titulo", "Solicitante", "Area", "Responsavel", "Categoria", "Status", "Prioridade", "Prazo", "Tags"];
+  const rows = tickets.map((ticket) => [
+    ticket.title,
+    ticket.requester,
+    ticket.department,
+    ticket.assignee,
+    categoryLabel[ticket.category],
+    statusLabel[ticket.status],
+    priorityLabel[ticket.priority],
+    formatDateTime(ticket.dueAt),
+    ticket.tags.join(", ")
+  ]);
+
+  return [headers, ...rows]
+    .map((row) => row.map(escapeCsv).join(","))
+    .join("\n");
+}
+
+function downloadTicketsCsv(tickets: Ticket[]) {
+  const csv = buildTicketsCsv(tickets);
+  const blob = new Blob([`\ufeff${csv}`], { type: "text/csv;charset=utf-8" });
+  const url = URL.createObjectURL(blob);
+  const link = document.createElement("a");
+  link.href = url;
+  link.download = `opsflow-fila-${new Date().toISOString().slice(0, 10)}.csv`;
+  link.click();
+  URL.revokeObjectURL(url);
 }
 
 function getFilterChips(filters: TicketFilters) {
@@ -185,13 +273,14 @@ export function App() {
   const [tickets, setTickets] = useState<Ticket[]>([]);
   const [stats, setStats] = useState<TicketStats>(emptyStats);
   const [insights, setInsights] = useState<TicketInsight[]>([]);
-  const [filters, setFilters] = useState<TicketFilters>({});
+  const [filters, setFilters] = useState<TicketFilters>(() => readFiltersFromUrl());
   const [selectedId, setSelectedId] = useState<string>();
   const [activeView, setActiveView] = useState<ViewMode>("overview");
   const [formMode, setFormMode] = useState<"create" | "edit">();
   const [ticketToDelete, setTicketToDelete] = useState<Ticket>();
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string>();
+  const [viewCopied, setViewCopied] = useState(false);
   const latestRequestId = useRef(0);
 
   const selectedTicket = useMemo(
@@ -253,12 +342,14 @@ export function App() {
 
   async function handleFilterChange(nextFilters: TicketFilters) {
     setFilters(nextFilters);
+    syncFiltersToUrl(nextFilters);
     await loadData(nextFilters);
   }
 
   async function clearFilters() {
     const clearedFilters: TicketFilters = {};
     setFilters(clearedFilters);
+    syncFiltersToUrl(clearedFilters);
     await loadData(clearedFilters);
   }
 
@@ -272,8 +363,19 @@ export function App() {
     const clearedFilters: TicketFilters = {};
     setFormMode(undefined);
     setFilters(clearedFilters);
+    syncFiltersToUrl(clearedFilters);
     await loadData(clearedFilters);
     setSelectedId(ticket.id);
+  }
+
+  async function copyCurrentView() {
+    if (typeof window === "undefined" || !navigator.clipboard) {
+      return;
+    }
+
+    await navigator.clipboard.writeText(window.location.href);
+    setViewCopied(true);
+    window.setTimeout(() => setViewCopied(false), 1600);
   }
 
   async function handleUpdateTicket(input: TicketFormPayload) {
@@ -484,6 +586,34 @@ export function App() {
 
           {activeView === "queue" && (
             <>
+              <section className="flex flex-col gap-3 rounded-md border border-slate-200 bg-white px-4 py-3 shadow-sm lg:flex-row lg:items-center lg:justify-between">
+                <div>
+                  <h2 className="text-sm font-semibold text-slate-950">Fila operacional compartilhável</h2>
+                  <p className="mt-1 text-xs leading-5 text-slate-600">
+                    A busca atual fica salva na URL e pode ser enviada para outra pessoa revisar a mesma visão.
+                  </p>
+                </div>
+                <div className="flex flex-wrap gap-2">
+                  <button
+                    className="inline-flex items-center gap-2 rounded-md border border-slate-200 px-3 py-2 text-sm font-semibold text-slate-800 hover:bg-slate-50"
+                    type="button"
+                    onClick={() => void copyCurrentView()}
+                  >
+                    {viewCopied ? <Check aria-hidden="true" className="h-4 w-4" /> : <Share2 aria-hidden="true" className="h-4 w-4" />}
+                    {viewCopied ? "Link copiado" : "Copiar visão"}
+                  </button>
+                  <button
+                    className="inline-flex items-center gap-2 rounded-md bg-slate-950 px-3 py-2 text-sm font-semibold text-white hover:bg-slate-800 disabled:cursor-not-allowed disabled:opacity-50"
+                    type="button"
+                    onClick={() => downloadTicketsCsv(tickets)}
+                    disabled={tickets.length === 0}
+                  >
+                    <Download aria-hidden="true" className="h-4 w-4" />
+                    Exportar CSV
+                  </button>
+                </div>
+              </section>
+
               <TicketFiltersPanel filters={filters} onChange={(nextFilters) => void handleFilterChange(nextFilters)} />
 
               {hasActiveFilters && (
