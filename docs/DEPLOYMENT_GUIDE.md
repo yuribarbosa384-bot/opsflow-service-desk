@@ -20,7 +20,7 @@ flowchart LR
 
 A demo web estática é publicada no GitHub Pages:
 
-- URL: https://yuribarbosa384-bot.github.io/opsflow-service-desk/
+- URL: https://yuribarbosacouto.github.io/opsflow-service-desk/
 - Workflow: `.github/workflows/pages.yml`
 - Modo: `github-pages`, usando dados demonstrativos versionados
 

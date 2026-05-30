@@ -1,12 +1,12 @@
 # OpsFlow Administrativo
 
-![CI](https://github.com/yuribarbosa384-bot/opsflow-service-desk/actions/workflows/ci.yml/badge.svg)
-![Pages](https://github.com/yuribarbosa384-bot/opsflow-service-desk/actions/workflows/pages.yml/badge.svg)
-![CodeQL](https://github.com/yuribarbosa384-bot/opsflow-service-desk/actions/workflows/codeql.yml/badge.svg)
+![CI](https://github.com/yuribarbosacouto/opsflow-service-desk/actions/workflows/ci.yml/badge.svg)
+![Pages](https://github.com/yuribarbosacouto/opsflow-service-desk/actions/workflows/pages.yml/badge.svg)
+![CodeQL](https://github.com/yuribarbosacouto/opsflow-service-desk/actions/workflows/codeql.yml/badge.svg)
 
 Sistema full stack para priorizar demandas administrativas, detectar gargalos, controlar SLAs e registrar decisões operacionais.
 
-[Demo online](https://yuribarbosa384-bot.github.io/opsflow-service-desk/) · [Repositório](https://github.com/yuribarbosa384-bot/opsflow-service-desk)
+[Demo online](https://yuribarbosacouto.github.io/opsflow-service-desk/) · [Repositório](https://github.com/yuribarbosacouto/opsflow-service-desk)
 
 ![Fluxo do OpsFlow](docs/assets/opsflow-flow.gif)
 
