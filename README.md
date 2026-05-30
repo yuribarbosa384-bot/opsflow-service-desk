@@ -75,6 +75,12 @@ Decisão técnica documentada: [ADR-001](docs/ADR-001-command-center-architectur
 
 Guia de demo, GitHub Pages, API local e ngrok: [docs/DEPLOYMENT_GUIDE.md](docs/DEPLOYMENT_GUIDE.md).
 
+## Demo online e API local
+
+A demo pública roda no GitHub Pages com dados demonstrativos versionados para que recrutadores consigam abrir, navegar e avaliar o produto sem login, instalação ou dependência de servidor gratuito dormindo.
+
+A API Express com SQLite continua disponível localmente para demonstrar persistência real, contratos REST, validação com Zod e CRUD completo. O próximo passo técnico é publicar esse backend com banco gerenciado em Render, Railway ou Fly.io.
+
 ## Como rodar
 
 Requisito: Node.js 24 ou superior.
@@ -90,7 +96,7 @@ URLs locais:
 - API: http://127.0.0.1:3333
 - Healthcheck: http://127.0.0.1:3333/health
 
-A demo online roda como frontend estático com dados demonstrativos. Para avaliar API, SQLite e persistência, rode o projeto localmente.
+Para avaliar API, SQLite e persistência, rode o projeto localmente.
 
 ## Scripts
 
@@ -153,6 +159,6 @@ due
 - Histórico de eventos por tarefa
 - Comentários internos
 - Autenticação e perfis de acesso
-- Exportação CSV
 - Backend publicado em Render, Railway ou Fly.io
-- Testes end-to-end
+- Mais cenários Playwright para relatórios, Kanban e filtros avançados
+- Relatório mensal exportável em PDF
