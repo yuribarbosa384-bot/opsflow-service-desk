@@ -107,16 +107,18 @@ npm run typecheck
 npm run test
 npm run test:e2e
 npm run build
+npm run start:api
 ```
 
 ## Qualidade e segurança
 
 - CI com typecheck, testes e build em `main` e pull requests
-- Playwright E2E cobrindo criação, filtro, edição e exclusão de tarefa
+- Playwright E2E cobrindo criação, filtro, edição, comentário interno e exclusão de tarefa
 - Deploy automatizado do frontend estático no GitHub Pages
 - CodeQL para análise estática de JavaScript e TypeScript
 - Dependabot para npm e GitHub Actions
 - Dependency Review para revisar mudanças de dependências em pull requests
+- `Dockerfile.api` para publicar a API em ambiente com volume persistente
 - Release notes em [docs/RELEASE_NOTES.md](docs/RELEASE_NOTES.md)
 
 ## API

@@ -1,0 +1,22 @@
+FROM node:24-bookworm-slim
+
+WORKDIR /app
+
+COPY package.json package-lock.json ./
+COPY apps/api/package.json apps/api/package.json
+COPY packages/domain/package.json packages/domain/package.json
+
+RUN npm ci
+
+COPY tsconfig.base.json ./
+COPY apps/api apps/api
+COPY packages/domain packages/domain
+
+ENV NODE_ENV=production
+ENV PORT=3333
+ENV OPSFLOW_DB_PATH=/data/opsflow.sqlite
+ENV OPSFLOW_SEED_PATH=/app/apps/api/data/tickets.seed.json
+
+EXPOSE 3333
+
+CMD ["npm", "run", "start", "-w", "@opsflow/api"]

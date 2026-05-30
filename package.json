@@ -11,6 +11,7 @@
   "scripts": {
     "dev": "concurrently -k -n API,WEB -c cyan,magenta \"npm run dev -w @opsflow/api\" \"npm run dev -w @opsflow/web\"",
     "build": "npm run build -w @opsflow/web",
+    "start:api": "npm run start -w @opsflow/api",
     "test": "npm run test -w @opsflow/domain && npm run test -w @opsflow/api && npm run test -w @opsflow/web",
     "test:e2e": "playwright test",
     "test:ci": "npm run test -- --run",
