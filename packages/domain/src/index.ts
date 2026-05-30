@@ -4,6 +4,7 @@ export const ticketStatuses = ["backlog", "triage", "in_progress", "waiting", "r
 export const ticketPriorities = ["low", "medium", "high", "urgent"] as const;
 export const ticketCategories = ["access", "documentation", "automation", "data", "incident"] as const;
 export const dueStates = ["overdue", "today", "week"] as const;
+export const ticketEventTypes = ["created", "updated", "status_changed", "comment_added", "deleted"] as const;
 
 export const ticketSchema = z.object({
   id: z.string().min(6),
@@ -72,14 +73,32 @@ export const ticketFilterSchema = z.object({
   due: z.enum(dueStates).optional()
 });
 
+export const ticketEventSchema = z.object({
+  id: z.string().min(6),
+  ticketId: z.string().min(6),
+  type: z.enum(ticketEventTypes),
+  actor: z.string().min(2),
+  message: z.string().min(4),
+  changes: z.array(z.string()).default([]),
+  createdAt: z.string().datetime()
+});
+
+export const createCommentSchema = z.object({
+  actor: z.string().min(2).default("Yuri Barbosa"),
+  message: z.string().min(4).max(500)
+});
+
 export type Ticket = z.infer<typeof ticketSchema>;
 export type CreateTicketInput = z.infer<typeof createTicketSchema>;
 export type UpdateTicketInput = z.infer<typeof updateTicketSchema>;
+export type TicketEvent = z.infer<typeof ticketEventSchema>;
+export type CreateCommentInput = z.infer<typeof createCommentSchema>;
 export type TicketFilters = z.infer<typeof ticketFilterSchema>;
 export type TicketStatus = (typeof ticketStatuses)[number];
 export type TicketPriority = (typeof ticketPriorities)[number];
 export type TicketCategory = (typeof ticketCategories)[number];
 export type DueState = (typeof dueStates)[number];
+export type TicketEventType = (typeof ticketEventTypes)[number];
 
 export const ticketCategoryNames: Record<TicketCategory, string> = {
   access: "Acessos",
@@ -87,6 +106,14 @@ export const ticketCategoryNames: Record<TicketCategory, string> = {
   automation: "Automação",
   data: "Dados",
   incident: "Incidentes"
+};
+
+export const ticketEventTypeNames: Record<TicketEventType, string> = {
+  created: "Criação",
+  updated: "Atualização",
+  status_changed: "Mudança de status",
+  comment_added: "Comentário",
+  deleted: "Exclusão"
 };
 
 export type SlaState = "healthy" | "at_risk" | "breached" | "done";

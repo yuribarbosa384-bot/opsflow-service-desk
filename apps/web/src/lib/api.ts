@@ -1,6 +1,8 @@
 import type {
+  CreateCommentInput,
   CreateTicketInput,
   Ticket,
+  TicketEvent,
   TicketFilters,
   TicketInsight,
   TicketStats,
@@ -19,11 +21,54 @@ const isBrowser = typeof window !== "undefined";
 const isLocalHost = isBrowser && ["localhost", "127.0.0.1"].includes(window.location.hostname);
 const useStaticDemo = isBrowser && !apiBase && !isLocalHost;
 let demoState = structuredClone(demoTickets);
+let demoEvents = createDemoEvents(demoState);
 
 function sortByDueDate(tickets: Ticket[]): Ticket[] {
   return tickets
     .slice()
     .sort((a, b) => new Date(a.dueAt).getTime() - new Date(b.dueAt).getTime());
+}
+
+function createDemoEvents(tickets: Ticket[]): TicketEvent[] {
+  return tickets.flatMap((ticket) => {
+    const events: TicketEvent[] = [
+      {
+        id: `evt-${ticket.id}-created`,
+        ticketId: ticket.id,
+        type: "created",
+        actor: "Sistema demo",
+        message: "Tarefa criada a partir da base demonstrativa",
+        changes: [`Responsável inicial: ${ticket.assignee}`, `Status inicial: ${ticket.status}`],
+        createdAt: ticket.createdAt
+      }
+    ];
+
+    if (ticket.updatedAt !== ticket.createdAt) {
+      events.push({
+        id: `evt-${ticket.id}-updated`,
+        ticketId: ticket.id,
+        type: ticket.status === "resolved" ? "status_changed" : "updated",
+        actor: "Sistema demo",
+        message: ticket.status === "resolved" ? "Tarefa concluída na base demonstrativa" : "Dados revisados na base demonstrativa",
+        changes: ticket.resolution ? [ticket.resolution] : ["Campos operacionais revisados"],
+        createdAt: ticket.updatedAt
+      });
+    }
+
+    return events;
+  }).sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+}
+
+function appendDemoEvent(event: Omit<TicketEvent, "id" | "createdAt" | "actor"> & { actor?: string }): TicketEvent {
+  const { actor, ...eventInput } = event;
+  const nextEvent: TicketEvent = {
+    id: `evt-demo-${Date.now()}-${Math.random().toString(16).slice(2, 8)}`,
+    actor: actor ?? "Yuri Barbosa",
+    createdAt: new Date().toISOString(),
+    ...eventInput
+  };
+  demoEvents = [nextEvent, ...demoEvents];
+  return nextEvent;
 }
 
 async function requestJson<T>(path: string, init?: RequestInit): Promise<T> {
@@ -81,6 +126,15 @@ export async function fetchInsights(): Promise<TicketInsight[]> {
   return response.data;
 }
 
+export async function fetchTicketEvents(ticketId: string): Promise<TicketEvent[]> {
+  if (useStaticDemo) {
+    return demoEvents.filter((event) => event.ticketId === ticketId);
+  }
+
+  const response = await requestJson<ApiResponse<TicketEvent[]>>(`/api/tickets/${ticketId}/events`);
+  return response.data;
+}
+
 export async function createTicket(input: CreateTicketInput): Promise<Ticket> {
   if (useStaticDemo) {
     const now = new Date().toISOString();
@@ -94,6 +148,12 @@ export async function createTicket(input: CreateTicketInput): Promise<Ticket> {
       dueAt: input.dueAt ?? now
     };
     demoState = [ticket, ...demoState];
+    appendDemoEvent({
+      ticketId: ticket.id,
+      type: "created",
+      message: "Tarefa criada",
+      changes: [`Responsável inicial: ${ticket.assignee}`, `Prioridade inicial: ${ticket.priority}`]
+    });
     return ticket;
   }
 
@@ -118,6 +178,15 @@ export async function updateTicket(id: string, input: UpdateTicketInput): Promis
       updatedAt: new Date().toISOString()
     };
     demoState = demoState.map((ticket) => ticket.id === id ? updated : ticket);
+    const changedKeys = Object.keys(input);
+    if (!(changedKeys.length === 1 && changedKeys[0] === "status")) {
+      appendDemoEvent({
+        ticketId: id,
+        type: "updated",
+        message: "Campos da tarefa atualizados",
+        changes: changedKeys.map((key) => `${key} alterado`)
+      });
+    }
     return updated;
   }
 
@@ -130,7 +199,15 @@ export async function updateTicket(id: string, input: UpdateTicketInput): Promis
 
 export async function updateTicketStatus(id: string, status: TicketStatus): Promise<Ticket> {
   if (useStaticDemo) {
-    return updateTicket(id, { status });
+    const current = demoState.find((ticket) => ticket.id === id);
+    const updated = await updateTicket(id, { status });
+    appendDemoEvent({
+      ticketId: id,
+      type: "status_changed",
+      message: current ? `Status alterado de ${current.status} para ${status}` : `Status alterado para ${status}`,
+      changes: []
+    });
+    return updated;
   }
 
   const response = await requestJson<ApiResponse<Ticket>>(`/api/tickets/${id}/status`, {
@@ -140,9 +217,35 @@ export async function updateTicketStatus(id: string, status: TicketStatus): Prom
   return response.data;
 }
 
+export async function addTicketComment(id: string, input: CreateCommentInput): Promise<TicketEvent> {
+  if (useStaticDemo) {
+    demoState = demoState.map((ticket) => ticket.id === id ? { ...ticket, updatedAt: new Date().toISOString() } : ticket);
+    return appendDemoEvent({
+      ticketId: id,
+      type: "comment_added",
+      actor: input.actor,
+      message: input.message,
+      changes: []
+    });
+  }
+
+  const response = await requestJson<ApiResponse<TicketEvent>>(`/api/tickets/${id}/comments`, {
+    method: "POST",
+    body: JSON.stringify(input)
+  });
+  return response.data;
+}
+
 export async function deleteTicket(id: string): Promise<void> {
   if (useStaticDemo) {
+    const current = demoState.find((ticket) => ticket.id === id);
     demoState = demoState.filter((ticket) => ticket.id !== id);
+    appendDemoEvent({
+      ticketId: id,
+      type: "deleted",
+      message: current ? `Tarefa excluída: ${current.title}` : "Tarefa excluída",
+      changes: []
+    });
     return;
   }
 

@@ -38,6 +38,10 @@ test("cria, filtra, edita e exclui uma tarefa administrativa", async ({ page }) 
   await expect(page.getByRole("heading", { name: updatedTitle })).toBeVisible();
   await expect(page.getByRole("button", { name: "Em andamento" })).toBeVisible();
 
+  await page.getByLabel("Comentário interno").fill("Comentário E2E para validar histórico operacional.");
+  await page.getByRole("button", { name: "Registrar comentário" }).click();
+  await expect(page.getByText("Comentário E2E para validar histórico operacional.")).toBeVisible();
+
   await page.getByRole("button", { name: "Excluir" }).click();
   await expect(page.getByRole("heading", { name: "Excluir tarefa?" })).toBeVisible();
   await page.getByRole("button", { name: "Confirmar exclusão" }).click();

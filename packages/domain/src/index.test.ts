@@ -1,9 +1,11 @@
 import { describe, expect, it } from "vitest";
 import {
   filterTickets,
+  createCommentSchema,
   getDueDateForPriority,
   getTicketRisk,
   getSlaState,
+  ticketEventSchema,
   getTicketInsights,
   getTicketStats,
   type Ticket
@@ -97,5 +99,23 @@ describe("ticket domain rules", () => {
   it("sets clear due dates based on priority", () => {
     expect(getDueDateForPriority("urgent", new Date("2026-05-20T12:00:00.000Z"))).toBe("2026-05-21T12:00:00.000Z");
     expect(getDueDateForPriority("low", new Date("2026-05-20T12:00:00.000Z"))).toBe("2026-05-27T12:00:00.000Z");
+  });
+
+  it("validates audit events and internal comments", () => {
+    const event = ticketEventSchema.parse({
+      id: "evt-ticket-1-created",
+      ticketId: "ticket-1",
+      type: "created",
+      actor: "Yuri Barbosa",
+      message: "Tarefa criada",
+      createdAt: "2026-05-20T12:00:00.000Z"
+    });
+
+    const comment = createCommentSchema.parse({
+      message: "Conferir pendências com o financeiro antes de alterar o prazo."
+    });
+
+    expect(event.changes).toEqual([]);
+    expect(comment.actor).toBe("Yuri Barbosa");
   });
 });

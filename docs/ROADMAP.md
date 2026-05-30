@@ -33,11 +33,16 @@
 
 - Histórico de eventos por tarefa
 - Comentários internos
+- API de timeline por tarefa
+- Persistência de auditoria em SQLite
+
+## Versão 0.5
+
 - Responsáveis cadastrados
 - Sugestão de rebalanceamento por responsável
 - Relatório mensal consolidado
 
-## Versão 0.5
+## Versão 0.6
 
 - Autenticação
 - Perfis de acesso

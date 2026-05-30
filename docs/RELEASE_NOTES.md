@@ -1,5 +1,12 @@
 # Release notes
 
+## 0.4.0 - Audit timeline
+
+- Added ticket event history for creation, updates, status changes, comments and deletion.
+- Added SQLite persistence for the `ticket_events` audit table.
+- Added API routes for global audit events, ticket timeline and internal comments.
+- Added the timeline and comment composer to the operational side panel.
+
 ## 0.3.0 - Portfolio readiness
 
 - Added shareable filter URLs for the operational queue.

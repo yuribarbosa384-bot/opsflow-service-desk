@@ -8,10 +8,12 @@ import {
   Download,
   FilterX,
   Gauge,
+  History,
   LayoutDashboard,
   Lightbulb,
   ListChecks,
   Loader2,
+  MessageSquare,
   Pencil,
   Plus,
   RefreshCcw,
@@ -25,12 +27,14 @@ import {
 import {
   dueStates,
   getTicketRisk,
+  ticketEventTypeNames,
   ticketCategories,
   ticketPriorities,
   ticketStatuses,
   type CreateTicketInput,
   type DueState,
   type Ticket,
+  type TicketEvent,
   type TicketCategory,
   type TicketFilters,
   type TicketInsight,
@@ -39,7 +43,7 @@ import {
   type TicketStatus,
   type UpdateTicketInput
 } from "@opsflow/domain";
-import { createTicket, deleteTicket, fetchInsights, fetchStats, fetchTickets, updateTicket, updateTicketStatus } from "./lib/api";
+import { addTicketComment, createTicket, deleteTicket, fetchInsights, fetchStats, fetchTicketEvents, fetchTickets, updateTicket, updateTicketStatus } from "./lib/api";
 import {
   categoryLabel,
   formatDateTime,
@@ -281,11 +285,20 @@ export function App() {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string>();
   const [viewCopied, setViewCopied] = useState(false);
+  const [ticketEvents, setTicketEvents] = useState<TicketEvent[]>([]);
+  const [eventsRefreshKey, setEventsRefreshKey] = useState(0);
+  const [commentText, setCommentText] = useState("");
+  const [isCommenting, setIsCommenting] = useState(false);
+  const [eventError, setEventError] = useState<string>();
   const latestRequestId = useRef(0);
 
+  const rankedTickets = useMemo(
+    () => sortByRisk(tickets, allTickets),
+    [allTickets, tickets]
+  );
   const selectedTicket = useMemo(
-    () => allTickets.find((ticket) => ticket.id === selectedId) ?? tickets[0] ?? allTickets[0],
-    [allTickets, selectedId, tickets]
+    () => allTickets.find((ticket) => ticket.id === selectedId) ?? rankedTickets[0] ?? sortByRisk(allTickets, allTickets)[0],
+    [allTickets, rankedTickets, selectedId]
   );
   const filterChips = useMemo(() => getFilterChips(filters), [filters]);
   const hasActiveFilters = filterChips.length > 0;
@@ -321,7 +334,7 @@ export function App() {
           return current;
         }
 
-        return ticketData[0]?.id ?? allTicketData[0]?.id;
+        return sortByRisk(ticketData, allTicketData)[0]?.id ?? sortByRisk(allTicketData, allTicketData)[0]?.id;
       });
       setError(undefined);
     } catch {
@@ -339,6 +352,33 @@ export function App() {
   useEffect(() => {
     void loadData(filters);
   }, []);
+
+  useEffect(() => {
+    const ticketId = selectedTicket?.id;
+    if (!ticketId) {
+      setTicketEvents([]);
+      return;
+    }
+
+    let isActive = true;
+    setEventError(undefined);
+    fetchTicketEvents(ticketId)
+      .then((events) => {
+        if (isActive) {
+          setTicketEvents(events);
+        }
+      })
+      .catch(() => {
+        if (isActive) {
+          setTicketEvents([]);
+          setEventError("Não foi possível carregar o histórico da tarefa.");
+        }
+      });
+
+    return () => {
+      isActive = false;
+    };
+  }, [selectedTicket?.id, eventsRefreshKey]);
 
   async function handleFilterChange(nextFilters: TicketFilters) {
     setFilters(nextFilters);
@@ -387,6 +427,7 @@ export function App() {
     setFormMode(undefined);
     await loadData(filters);
     setSelectedId(ticket.id);
+    setEventsRefreshKey((current) => current + 1);
   }
 
   async function handleDeleteTicket() {
@@ -408,6 +449,30 @@ export function App() {
     const ticket = await updateTicketStatus(selectedTicket.id, status);
     await loadData(filters);
     setSelectedId(ticket.id);
+    setEventsRefreshKey((current) => current + 1);
+  }
+
+  async function handleAddComment() {
+    if (!selectedTicket || !commentText.trim()) {
+      return;
+    }
+
+    setIsCommenting(true);
+    setEventError(undefined);
+    try {
+      const event = await addTicketComment(selectedTicket.id, {
+        actor: "Yuri Barbosa",
+        message: commentText.trim()
+      });
+      setTicketEvents((current) => [event, ...current]);
+      setCommentText("");
+      await loadData(filters);
+      setSelectedId(selectedTicket.id);
+    } catch {
+      setEventError("Não foi possível registrar o comentário.");
+    } finally {
+      setIsCommenting(false);
+    }
   }
 
   const statusChart = ticketStatuses.map((status) => ({
@@ -648,7 +713,7 @@ export function App() {
                     Carregando tarefas
                   </section>
                 ) : tickets.length > 0 ? (
-                  <TicketTable tickets={tickets} allTickets={allTickets} selectedId={selectedTicket?.id} onSelect={(ticket) => setSelectedId(ticket.id)} />
+                  <TicketTable tickets={rankedTickets} allTickets={allTickets} selectedId={selectedTicket?.id} onSelect={(ticket) => setSelectedId(ticket.id)} />
                 ) : (
                   <EmptyQueue hasFilters={hasActiveFilters} onClear={() => void clearFilters()} />
                 )}
@@ -736,6 +801,60 @@ export function App() {
                           ))}
                         </ul>
                       </div>
+
+                      <section className="border-t border-slate-200 pt-4">
+                        <div className="mb-3 flex items-center gap-2 font-semibold">
+                          <History aria-hidden="true" className="h-4 w-4 text-cyan-700" />
+                          Histórico e comentários
+                        </div>
+                        <div className="space-y-2">
+                          <label className="block text-xs font-semibold uppercase text-slate-500" htmlFor="ticket-comment">
+                            Comentário interno
+                          </label>
+                          <textarea
+                            id="ticket-comment"
+                            className="min-h-20 w-full rounded-md border border-slate-200 px-3 py-2 text-sm text-slate-900"
+                            maxLength={500}
+                            placeholder="Registre decisão, impedimento ou próximo passo..."
+                            value={commentText}
+                            onChange={(event) => setCommentText(event.target.value)}
+                          />
+                          <button
+                            className="inline-flex items-center gap-2 rounded-md bg-slate-950 px-3 py-2 text-sm font-semibold text-white hover:bg-slate-800 disabled:cursor-not-allowed disabled:opacity-50"
+                            type="button"
+                            disabled={isCommenting || !commentText.trim()}
+                            onClick={() => void handleAddComment()}
+                          >
+                            {isCommenting ? <Loader2 aria-hidden="true" className="h-4 w-4 animate-spin" /> : <MessageSquare aria-hidden="true" className="h-4 w-4" />}
+                            Registrar comentário
+                          </button>
+                        </div>
+
+                        {eventError && (
+                          <p className="mt-3 rounded-md border border-rose-200 bg-rose-50 px-3 py-2 text-xs font-medium text-rose-900">{eventError}</p>
+                        )}
+
+                        <ol className="mt-4 max-h-72 space-y-3 overflow-y-auto border-l border-slate-200 pl-4">
+                          {ticketEvents.map((event) => (
+                            <li key={event.id} className="relative text-sm">
+                              <span className="absolute -left-[21px] top-1.5 h-2.5 w-2.5 rounded-full border border-white bg-cyan-700" />
+                              <div className="flex flex-wrap items-center gap-2">
+                                <span className="font-semibold text-slate-950">{ticketEventTypeNames[event.type]}</span>
+                                <span className="text-xs text-slate-500">{formatDateTime(event.createdAt)}</span>
+                              </div>
+                              <p className="mt-1 leading-6 text-slate-700">{event.message}</p>
+                              <p className="mt-1 text-xs text-slate-500">Por {event.actor}</p>
+                              {event.changes.length > 0 && (
+                                <ul className="mt-2 space-y-1 text-xs text-slate-600">
+                                  {event.changes.map((change) => (
+                                    <li key={change}>{change}</li>
+                                  ))}
+                                </ul>
+                              )}
+                            </li>
+                          ))}
+                        </ol>
+                      </section>
                     </div>
                   ) : (
                     <p className="text-sm text-slate-600">Selecione uma tarefa para ver detalhes, histórico e ações rápidas.</p>

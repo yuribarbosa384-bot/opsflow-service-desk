@@ -85,6 +85,9 @@ describe("OpsFlow API", () => {
     expect(response.body.data.title).toBe("Automatizar painel administrativo");
     expect(response.body.data.status).toBe("waiting");
     expect(response.body.data.assignee).toBe("Carlos Lima");
+
+    const events = await request(app).get("/api/tickets/tk-test-1/events").expect(200);
+    expect(events.body.data.some((event: { type: string }) => event.type === "updated")).toBe(true);
   });
 
   it("updates ticket status", async () => {
@@ -97,6 +100,24 @@ describe("OpsFlow API", () => {
 
     expect(response.body.data.status).toBe("resolved");
     expect(response.body.data.resolution).toContain("Fluxo");
+
+    const events = await request(app).get("/api/tickets/tk-test-1/events").expect(200);
+    expect(events.body.data[0].type).toBe("status_changed");
+  });
+
+  it("adds internal comments to the audit timeline", async () => {
+    const app = createApp(createMemoryRepository(tickets));
+
+    const response = await request(app)
+      .post("/api/tickets/tk-test-1/comments")
+      .send({ message: "Validar dependência com o financeiro antes do fechamento." })
+      .expect(201);
+
+    expect(response.body.data.type).toBe("comment_added");
+    expect(response.body.data.actor).toBe("Yuri Barbosa");
+
+    const events = await request(app).get("/api/tickets/tk-test-1/events").expect(200);
+    expect(events.body.data[0].message).toContain("financeiro");
   });
 
   it("deletes a task with confirmation support", async () => {
@@ -106,5 +127,8 @@ describe("OpsFlow API", () => {
 
     const response = await request(app).get("/api/tickets").expect(200);
     expect(response.body.data).toHaveLength(0);
+
+    const events = await request(app).get("/api/events").expect(200);
+    expect(events.body.data[0].type).toBe("deleted");
   });
 });

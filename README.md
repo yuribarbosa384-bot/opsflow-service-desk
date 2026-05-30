@@ -4,7 +4,7 @@
 ![Pages](https://github.com/yuribarbosa384-bot/opsflow-service-desk/actions/workflows/pages.yml/badge.svg)
 ![CodeQL](https://github.com/yuribarbosa384-bot/opsflow-service-desk/actions/workflows/codeql.yml/badge.svg)
 
-Sistema full stack para priorizar demandas administrativas, detectar gargalos e controlar prazos críticos.
+Sistema full stack para priorizar demandas administrativas, detectar gargalos, controlar SLAs e registrar decisões operacionais.
 
 [Demo online](https://yuribarbosa384-bot.github.io/opsflow-service-desk/) · [Repositório](https://github.com/yuribarbosa384-bot/opsflow-service-desk)
 
@@ -21,7 +21,7 @@ Equipes administrativas costumam acompanhar documentos, contratos, acessos, apro
 - Qual categoria está travando a operação?
 - Qual tarefa precisa ser feita primeiro?
 
-O OpsFlow organiza esse fluxo em um Command Center com dashboard, score de risco, fila operacional, Kanban, relatórios e ações de criação, edição e exclusão.
+O OpsFlow organiza esse fluxo em uma Central de Operações e SLA com dashboard, score de risco, fila operacional, Kanban, relatórios, auditoria de mudanças e comentários internos.
 
 ## Funcionalidades
 
@@ -35,6 +35,8 @@ O OpsFlow organiza esse fluxo em um Command Center com dashboard, score de risco
 - Relatórios simples por status, categoria e responsável
 - Exportação CSV da fila filtrada
 - CRUD completo de tarefas
+- Histórico de eventos por tarefa
+- Comentários internos no painel lateral
 - Confirmação antes de excluir
 - Demo pública com dados demonstrativos
 - API local com Express, validação Zod e banco SQLite
@@ -123,9 +125,12 @@ npm run build
 GET     /health
 GET     /api/analytics
 GET     /api/insights
+GET     /api/events
 GET     /api/tickets
 GET     /api/tickets/:id
+GET     /api/tickets/:id/events
 POST    /api/tickets
+POST    /api/tickets/:id/comments
 PUT     /api/tickets/:id
 PATCH   /api/tickets/:id/status
 DELETE  /api/tickets/:id
@@ -146,9 +151,10 @@ due
 ## O que este projeto demonstra
 
 - Modelagem de domínio com tipos e validação compartilhados
-- Banco SQLite com seed, índices e persistência local
+- Banco SQLite com seed, índices, persistência local e trilha de auditoria
 - API REST com contratos, filtros, métricas, insights e tratamento de erros
 - Interface responsiva com dashboard, fila, Kanban, relatórios e painel de detalhe
+- Histórico por tarefa com criação, atualização, mudança de status, comentários e exclusão
 - Testes de regra de negócio, API e formulário
 - CI com typecheck, testes e build
 - Deploy estático com GitHub Pages
@@ -156,9 +162,8 @@ due
 
 ## Evoluções planejadas
 
-- Histórico de eventos por tarefa
-- Comentários internos
 - Autenticação e perfis de acesso
+- Notificações por e-mail ou Slack para SLA em risco
 - Backend publicado em Render, Railway ou Fly.io
 - Mais cenários Playwright para relatórios, Kanban e filtros avançados
 - Relatório mensal exportável em PDF
