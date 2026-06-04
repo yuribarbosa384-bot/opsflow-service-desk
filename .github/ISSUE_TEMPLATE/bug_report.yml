@@ -1,0 +1,52 @@
+name: Bug report
+description: Report a reproducible problem in OpsFlow.
+title: "fix: "
+labels: ["bug"]
+body:
+  - type: textarea
+    id: summary
+    attributes:
+      label: Summary
+      description: What is broken or confusing?
+      placeholder: The risk score...
+    validations:
+      required: true
+  - type: textarea
+    id: steps
+    attributes:
+      label: Steps to reproduce
+      description: Use demo data only.
+      placeholder: |
+        1. Open the queue
+        2. Filter by urgent tasks
+        3. Open task details
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: Expected behavior
+    validations:
+      required: true
+  - type: textarea
+    id: actual
+    attributes:
+      label: Actual behavior
+    validations:
+      required: true
+  - type: dropdown
+    id: area
+    attributes:
+      label: Area
+      options:
+        - Web UI
+        - API
+        - Domain rules
+        - Database
+        - CI/CD
+        - Documentation
+  - type: textarea
+    id: evidence
+    attributes:
+      label: Evidence
+      description: Screenshots, console errors, API responses, or logs.

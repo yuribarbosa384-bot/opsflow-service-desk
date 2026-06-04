@@ -77,6 +77,12 @@ Decisão técnica documentada: [ADR-001](docs/ADR-001-command-center-architectur
 
 Guia de demo, GitHub Pages, API local e ngrok: [docs/DEPLOYMENT_GUIDE.md](docs/DEPLOYMENT_GUIDE.md).
 
+## Governanca
+
+- Guia de contribuicao: [CONTRIBUTING.md](CONTRIBUTING.md)
+- Politica de seguranca: [SECURITY.md](SECURITY.md)
+- Templates de issue e pull request em [`.github`](.github)
+
 ## Demo online e API local
 
 A demo pública roda no GitHub Pages com dados demonstrativos versionados para que recrutadores consigam abrir, navegar e avaliar o produto sem login, instalação ou dependência de servidor gratuito dormindo.
