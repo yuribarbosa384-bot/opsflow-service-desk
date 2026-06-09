@@ -1,5 +1,7 @@
 # OpsFlow Administrativo
 
+Projeto principal do portfolio: sistema full stack para operacoes, SLA, priorizacao, regras de negocio, banco local, testes e documentacao. Ele se conecta ao [Portfolio Dev](https://yuribarbosacouto.github.io/yuri-dev-portfolio/) como estudo de caso principal.
+
 ![CI](https://github.com/yuribarbosacouto/opsflow-service-desk/actions/workflows/ci.yml/badge.svg)
 ![Pages](https://github.com/yuribarbosacouto/opsflow-service-desk/actions/workflows/pages.yml/badge.svg)
 ![CodeQL](https://github.com/yuribarbosacouto/opsflow-service-desk/actions/workflows/codeql.yml/badge.svg)
