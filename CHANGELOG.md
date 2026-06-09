@@ -2,6 +2,13 @@
 
 All notable changes to OpsFlow Administrativo are documented here.
 
+## [0.1.1] - 2026-06-09
+
+### Changed
+
+- Updated development dependencies through Dependabot maintenance PRs.
+- Simplified the CI test script to avoid redundant npm argument forwarding warnings.
+
 ## [0.1.0] - 2026-06-09
 
 ### Added

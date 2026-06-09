@@ -14,7 +14,7 @@
     "start:api": "npm run start -w @opsflow/api",
     "test": "npm run test -w @opsflow/domain && npm run test -w @opsflow/api && npm run test -w @opsflow/web",
     "test:e2e": "playwright test",
-    "test:ci": "npm run test -- --run",
+    "test:ci": "npm run test",
     "typecheck": "npm run typecheck -w @opsflow/domain && npm run typecheck -w @opsflow/api && npm run typecheck -w @opsflow/web"
   },
   "devDependencies": {
