@@ -23,6 +23,25 @@ const tickets: Ticket[] = [
 ];
 
 describe("OpsFlow API", () => {
+  it("rejects external origins before reading or changing tickets", async () => {
+    const repository = createMemoryRepository(tickets);
+    const app = createApp(repository);
+    await request(app).get("/api/tickets").set("Origin", "https://untrusted.example").expect(403);
+    await request(app).delete("/api/tickets/tk-test-1").set("Origin", "https://untrusted.example").expect(403);
+    await request(app).delete("/api/tickets/tk-test-1").set("Origin", "null").expect(403);
+    expect(await repository.findAll()).toHaveLength(1);
+  });
+
+  it("allows the local frontend and its preflight", async () => {
+    const app = createApp(createMemoryRepository(tickets));
+    for (const origin of ["http://localhost:5173", "http://127.0.0.1:5173"]) {
+      const response = await request(app).get("/api/tickets").set("Origin", origin).expect(200);
+      expect(response.headers["access-control-allow-origin"]).toBe(origin);
+      await request(app).options("/api/tickets").set("Origin", origin)
+        .set("Access-Control-Request-Method", "POST").expect(204);
+    }
+  });
+
   it("returns health status", async () => {
     const app = createApp(createMemoryRepository(tickets));
 

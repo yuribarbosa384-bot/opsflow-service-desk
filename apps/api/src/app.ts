@@ -73,7 +73,20 @@ function describeTicketChanges(before: Ticket, after: Ticket): string[] {
 export function createApp(repository: TicketRepository) {
   const app = express();
 
-  app.use(cors());
+  const allowedOrigins = new Set([
+    "http://localhost:5173",
+    "http://127.0.0.1:5173"
+  ]);
+  // Reject requests, not just CORS response headers, before any mutation runs.
+  app.use((req, res, next) => {
+    const origin = req.get("origin");
+    if (origin && !allowedOrigins.has(origin)) {
+      res.status(403).json({ error: "Origin not allowed" });
+      return;
+    }
+    next();
+  });
+  app.use(cors({ origin: [...allowedOrigins] }));
   app.use(express.json());
 
   app.get("/health", (_req, res) => {

@@ -1,5 +1,7 @@
 # OpsFlow Administrativo
 
+> Estudo com apoio significativo de IA, não um sistema pronto para produção nem evidência de domínio independente de toda a stack. Use somente dados fictícios. A API não possui autenticação ou autorização de usuários.
+
 Projeto principal do portfolio: sistema full stack para operacoes, SLA, priorizacao, regras de negocio, banco local, testes e documentacao. Ele se conecta ao [Portfolio Dev](https://yuribarbosacouto.github.io/yuri-dev-portfolio/) como estudo de caso principal.
 
 ![CI](https://github.com/yuribarbosacouto/opsflow-service-desk/actions/workflows/ci.yml/badge.svg)
@@ -89,7 +91,7 @@ Guia de demo, GitHub Pages, API local e ngrok: [docs/DEPLOYMENT_GUIDE.md](docs/D
 
 A demo pública roda no GitHub Pages com dados demonstrativos versionados para que recrutadores consigam abrir, navegar e avaliar o produto sem login, instalação ou dependência de servidor gratuito dormindo.
 
-A API Express com SQLite continua disponível localmente para demonstrar persistência real, contratos REST, validação com Zod e CRUD completo. O próximo passo técnico é publicar esse backend com banco gerenciado em Render, Railway ou Fly.io.
+A API Express com SQLite continua disponível localmente para demonstrar persistência real, contratos REST, validação com Zod e CRUD completo. Por padrão, escuta apenas em `127.0.0.1` e aceita origens de navegador locais na porta 5173. Não exponha a API à internet: essas restrições não substituem autenticação e autorização.
 
 ## Como rodar
 

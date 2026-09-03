@@ -14,6 +14,7 @@ COPY packages/domain packages/domain
 
 ENV NODE_ENV=production
 ENV PORT=3333
+ENV OPSFLOW_HOST=0.0.0.0
 ENV OPSFLOW_DB_PATH=/data/opsflow.sqlite
 ENV OPSFLOW_SEED_PATH=/app/apps/api/data/tickets.seed.json
 

@@ -1,81 +1,33 @@
-# Deployment guide
+# Execução de demonstração
 
-Este guia resume o caminho sugerido no plano de portfólio: remover fricção de demo, manter validação automática e preparar o projeto para ambientes de avaliação.
-
-## Estratégia
-
-```mermaid
-flowchart LR
-  PR["Pull request"] --> CI["typecheck + tests + build + e2e"]
-  CI --> Preview["Preview deploy"]
-  Main["main"] --> Pages["GitHub Pages web demo"]
-  Local["Ambiente local"] --> Api["Express API"]
-  Api --> Db["SQLite"]
-  Docker["Dockerfile.api"] --> ApiDeploy["API pública"]
-  ApiDeploy --> Disk["Volume persistente"]
-  Local --> Ngrok["ngrok para demo temporária"]
-```
+Este projeto é um estudo com dados fictícios. A API não tem autenticação ou autorização e não deve ser publicada na internet, nem exposta por túneis. As orientações anteriores de publicação direta foram retiradas por esse motivo.
 
 ## Web pública
 
-A demo web estática é publicada no GitHub Pages:
-
-- URL: https://yuribarbosacouto.github.io/opsflow-service-desk/
-- Workflow: `.github/workflows/pages.yml`
-- Modo: `github-pages`, usando dados demonstrativos versionados
+A demonstração do GitHub Pages usa dados demonstrativos versionados e não exige publicar a API local.
 
 ## API local
 
-Para avaliar API, banco e persistência:
-
 ```bash
-npm install
+npm ci
 npm run dev
 ```
 
-URLs:
+A web usa a porta 5173 e a API usa `http://127.0.0.1:3333`. A API escuta somente no próprio computador por padrão. Requisições de navegador com origem diferente de `http://localhost:5173` ou `http://127.0.0.1:5173` são rejeitadas antes das operações.
 
-- Web local: http://127.0.0.1:5173
-- API local: http://127.0.0.1:3333
-- Healthcheck: http://127.0.0.1:3333/health
+Isso não autentica usuários: processos locais e clientes sem cabeçalho Origin continuam acessando a API. Não use dados reais ou credenciais.
 
-## API em Docker
-
-O backend já possui `Dockerfile.api` para deploy em serviços que aceitam container, como Render, Railway ou Fly.io.
-
-Build local:
+## Docker local
 
 ```bash
 docker build -f Dockerfile.api -t opsflow-api .
+docker run --rm -p 127.0.0.1:3333:3333 -v opsflow-data:/data opsflow-api
 ```
 
-Execução local com volume persistente:
+O container usa `OPSFLOW_HOST=0.0.0.0` internamente para permitir o encaminhamento de portas. A publicação da porta deve permanecer em `127.0.0.1` no computador anfitrião. Não use `-p 3333:3333`, pois isso pode expor a porta na rede.
 
-```bash
-docker run --rm -p 3333:3333 -v opsflow-data:/data opsflow-api
-```
+Variáveis: `PORT`, `OPSFLOW_HOST`, `OPSFLOW_DB_PATH` e `OPSFLOW_SEED_PATH`. Alterar o host para uma interface pública remove a proteção de isolamento local. O volume mantém os dados entre reinícios, mas não substitui backup.
 
-Variáveis suportadas:
+## Limites
 
-```text
-PORT=3333
-OPSFLOW_DB_PATH=/data/opsflow.sqlite
-OPSFLOW_SEED_PATH=/app/apps/api/data/tickets.seed.json
-```
-
-Para produção, use volume persistente no caminho `/data`; sem volume, o SQLite funciona, mas os dados podem ser perdidos quando o container reiniciar.
-
-## Demo temporária com ngrok
-
-Use quando for necessário mostrar o ambiente local com API real:
-
-```bash
-ngrok http 5173
-ngrok http 3333
-```
-
-Para a web consumir a API externa, defina `VITE_API_URL` apontando para a URL pública da API.
-
-## Próximo deploy de backend
-
-O próximo passo recomendado é publicar a API com `Dockerfile.api` em Render, Railway ou Fly.io usando volume persistente. A demo estática já reduz a fricção inicial, mas uma API pública completa demonstraria persistência real fora da máquina local.
+Controle de acesso, identidade confiável no histórico e consistência entre alterações e eventos ainda precisam de revisão antes de qualquer uso operacional. Os testes locais não certificam segurança de produção.
